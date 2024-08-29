@@ -28,6 +28,31 @@
       <a class="gallery-item" href="{{ $image.RelPermalink }}" data-pswp-src="{{ $full.RelPermalink }}" data-pswp-width="{{ $full.Width }}" data-pswp-height="{{ $full.Height }}" title="{{ .Title }}" itemscope itemtype="https://schema.org/ImageObject" style="aspect-ratio: {{ $thumbnail.Width }} / {{ $thumbnail.Height }}">
         <figure style="background-color: {{ $color }}; aspect-ratio: {{ $thumbnail.Width }} / {{ $thumbnail.Height }}">
           <img class="lazyload" width="{{ $thumbnail.Width }}" height="{{ $thumbnail.Height }}" data-src="{{ $thumbnail.RelPermalink }}" alt="{{ .Title }}" />
+          {{ if $image.Exif }}
+          <span class="pswp-caption-content">
+             {{ with $image.Exif.Tags }}
+              {{ with .Title }}{{ . }} &middot; {{ end }}
+              {{ with $image.Exif.Date }}
+              {{  if lt (int ( time.Format "2006" .)) 2008 }}
+                Avant 2008
+              {{ else }}
+                  {{ time.Format "2 Jan 2006 15h04 -07:00" . }}
+              {{ end }}
+              {{ end }}
+              <br/>
+               {{ if .Model }}
+                {{ .Make }} {{ .Model }}
+               {{ end }}
+               {{ if and .LensModel (ne (string .LensModel) "----") }} &middot; {{ .LensModel }}{{ end }}
+               <br/>
+               {{ if and .FocalLength (ne (string .FocalLength) "0") }} {{ .FocalLength }}mm &middot;{{ end }}
+               {{ if and .FNumber (ne (string .FNumber) "0") }} F{{float .FNumber }} &middot;{{ end }}
+               {{ with .ApertureValue }}f/{{ div (math.Round (mul (float .) 10)) 10 }}{{ end }}
+               {{ with .ExposureTime }}{{ . }}s &middot; {{ end }}
+               {{ with .ISO }}ISO {{ . }}{{ end }}
+             {{ end }}
+           </span>
+         {{ end }}
         </figure>
         <meta itemprop="contentUrl" content="{{ $image.RelPermalink }}" />
         {{ with site.Params.Author }}
