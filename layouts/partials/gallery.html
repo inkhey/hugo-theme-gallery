@@ -13,10 +13,13 @@
         {{/* Title from front matter */}}
         {{ $title = $image.Title }}
       {{ end }}
+       {{ $video := "" }}
+       {{ $video = $image.Params.video }}
       {{ $images = $images | append (dict
         "Name" $image.Name
         "Title" $title
         "image" $image
+        "Video" $video
         )
       }}
     {{ end }}
@@ -25,7 +28,9 @@
       {{ $thumbnail := $image.Filter (slice images.AutoOrient (images.Process "fit 600x600")) }}
       {{ $full := $image.Filter (slice images.AutoOrient (images.Process "fit 1600x1600")) }}
       {{ $color := index $thumbnail.Colors 0 | default "transparent" }}
-      <a class="gallery-item" href="{{ $image.RelPermalink }}" data-pswp-src="{{ $full.RelPermalink }}" data-pswp-width="{{ $full.Width }}" data-pswp-height="{{ $full.Height }}" title="{{ .Title }}" itemscope itemtype="https://schema.org/ImageObject" style="aspect-ratio: {{ $thumbnail.Width }} / {{ $thumbnail.Height }}">
+      {{ $title_html := partial "image_title.html" . }}
+      <div class="gallery-item">
+      <a href="{{ $image.RelPermalink }}" data-pswp-src="{{ $full.RelPermalink }}" data-pswp-width="{{ $full.Width }}" data-pswp-height="{{ $full.Height }}" title="{{ $title_html | safeHTML }}" itemscope itemtype="https://schema.org/ImageObject" style="aspect-ratio: {{ $thumbnail.Width }} / {{ $thumbnail.Height }}">
         <figure style="background-color: {{ $color }}; aspect-ratio: {{ $thumbnail.Width }} / {{ $thumbnail.Height }}">
           <noscript>
             <img loading="lazy" width="{{ $thumbnail.Width }}" height="{{ $thumbnail.Height }}" src="{{ $thumbnail.RelPermalink }}" alt="{{ .Title }}" />
@@ -39,6 +44,10 @@
           </span>
         {{ end }}
       </a>
+        <span class="pswp-caption-content">
+            {{ $title_html }}
+        </span>
+      </div>
     {{ end }}
   </div>
   <script>menu =document.getElementById('menu')

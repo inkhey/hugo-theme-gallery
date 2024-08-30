@@ -52,7 +52,7 @@ if (gallery) {
         el.setAttribute("rel", "noopener");
         el.setAttribute("title", params.downloadTitle || "Download");
         pswp.on("change", () => {
-          el.href = pswp.currSlide.data.element.href;
+          el.href = pswp.currSlide.data.element.children[0].href;
         });
       },
     });
