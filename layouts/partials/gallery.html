@@ -3,11 +3,14 @@
     {{ $images := slice }}
     {{ range $image :=  .Resources.ByType "image" }}
       {{ $title := "" }}
-      {{ with $image.Exif }}
+          {{ if reflect.IsImageResourceWithMeta $image }}
+          {{ with $image.Meta }}
+          {{ with .Exif }}
         {{ with .Tags.ImageDescription }}
           {{/* Title from EXIF ImageDescription */}}
           {{ $title = . }}
-        {{ end }}
+        {{ end }}{{ end }} {{ end }}
+
       {{ end }}
       {{ if ne $image.Title $image.Name }}
         {{/* Title from front matter */}}
@@ -31,11 +34,12 @@
             <img loading="lazy" width="{{ $thumbnail.Width }}" height="{{ $thumbnail.Height }}" src="{{ $thumbnail.RelPermalink }}" alt="{{ .Title }}" />
           </noscript>
           <img class="lazyload" width="{{ $thumbnail.Width }}" height="{{ $thumbnail.Height }}" data-src="{{ $thumbnail.RelPermalink }}" alt="{{ .Title }}" />
-          {{ if $image.Exif }}
+          {{ if reflect.IsImageResourceWithMeta $image }}
+          {{ with $image.Meta }}
+          {{ with .Exif }}
           <span class="pswp-caption-content">
-             {{ with $image.Exif.Tags }}
               {{ with .Title }}{{ . }} &middot; {{ end }}
-              {{ with $image.Exif.Date }}
+              {{ with .Date }}
               {{  if lt (int ( time.Format "2006" .)) 2008 }}
                 Avant 2008
               {{ else }}
@@ -53,9 +57,8 @@
                {{ with .ApertureValue }}f/{{ div (math.Round (mul (float .) 10)) 10 }}{{ end }}
                {{ with .ExposureTime }}{{ . }}s &middot; {{ end }}
                {{ with .ISO }}ISO {{ . }}{{ end }}
-             {{ end }}
            </span>
-         {{ end }}
+         {{ end }} {{ end }} {{ end }}
         </figure>
         <meta itemprop="contentUrl" content="{{ $image.RelPermalink }}" />
         {{ with site.Params.Author }}
