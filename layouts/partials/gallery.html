@@ -3,13 +3,12 @@
     {{ $images := slice }}
     {{ range $image :=  .Resources.ByType "image" }}
       {{ $title := "" }}
-      {{ with $image.Exif }}
-        {{ with .Tags.ImageDescription }}
-          {{/* Title from EXIF ImageDescription */}}
+      {{ with $image.Meta.IPTC }}
+        {{ with .ImageDescription }}
           {{ $title = . }}
         {{ end }}
       {{ end }}
-      {{ if ne $image.Title $image.Name }}
+      {{ if ne $image.Meta.IPTC.Title $image.Meta.IPTC.Name }}
         {{/* Title from front matter */}}
         {{ $title = $image.Title }}
       {{ end }}
